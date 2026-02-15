@@ -1,0 +1,4 @@
+project_id = "xjzpgeupwcqgyvohmvyn"
+
+[functions.solve-cube]
+verify_jwt = false
