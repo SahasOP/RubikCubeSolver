@@ -74,8 +74,8 @@ export function CubePlayer({ scramble = "", solution = "", puzzle = "3x3x3", tem
 
       // Style the player
       player.style.width = "100%";
-      player.style.minHeight = "400px";
-      player.style.height = "420px";
+      player.style.minHeight = "360px";
+      player.style.height = "360px";
 
       containerRef.current.appendChild(player);
       playerRef.current = player;

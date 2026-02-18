@@ -7,7 +7,7 @@ export default function Header() {
   const { user } = useAuth();
   return (
     <motion.header initial={{ y: -100, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ type: "spring", stiffness: 100, damping: 20 }} className="border-b border-slate-700/50 bg-black/20 backdrop-blur-xl sticky top-0 z-50 shadow-2xl">
-      <div className="container mx-auto px-4 py-5">
+      <div className="container mx-auto px-4 py-2">
         <div className="flex items-center justify-between">
           <motion.div className="flex items-center gap-4" whileHover={{ scale: 1.02 }}>
             <motion.div

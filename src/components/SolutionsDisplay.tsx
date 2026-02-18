@@ -46,58 +46,51 @@ export function SolutionsDisplay({ setIsAutoPlay, setPlayerKey }: SolutionsDispl
 
   if (sortedData.length === 0) {
     return (
-      <div className="h-full flex flex-col items-center justify-center p-8 border border-white/5 rounded-[2.5rem] bg-slate-950/40 backdrop-blur-3xl">
-        <div className="w-16 h-16 rounded-full bg-white/5 flex items-center justify-center mb-4 border border-white/10">
-          <Sparkles className="w-8 h-8 text-slate-500" />
-        </div>
-        <p className="text-sm font-bold uppercase tracking-widest text-slate-500 text-center">Waiting for search...</p>
+      <div className="flex flex-col items-center justify-center py-10 text-center">
+        <Sparkles className="w-8 h-8 text-white/20 mb-3" />
+        <p className="text-xs uppercase tracking-widest text-white/40">Waiting for search...</p>
       </div>
     );
   }
 
   return (
-    <div className="h-full flex flex-col">
-      <div className="flex items-center justify-between mb-6 px-2">
-        <div className="flex items-center gap-3">
-          <div className="p-2 rounded-xl bg-cyan-500/10 border border-cyan-500/20">
-            <ListMusic className="w-4 h-4 text-cyan-400" />
-          </div>
-          <div>
-            <h3 className="text-xs font-black uppercase tracking-[0.2em] text-slate-100">Optimal Paths</h3>
-            <p className="text-[10px] font-bold text-slate-500 uppercase">{totalCount} Found</p>
-          </div>
-        </div>
-
+    <div className="flex flex-col h-full min-h-0 overflow-hidden">
+      {/* Header */}
+      <div className="flex items-center justify-between mb-4">
         {sortedData.length > 3 && (
-          <button onClick={() => setShowAll(!showAll)} className="text-[10px] font-black uppercase tracking-widest text-cyan-500 hover:text-cyan-400 transition-colors flex items-center gap-1">
+          <button onClick={() => setShowAll(!showAll)} className="text-[10px] uppercase tracking-wide text-cyan-400 hover:text-cyan-300 transition">
             {showAll ? "Collapse" : "View All"}
-            <ChevronDown className={`w-3 h-3 transition-transform ${showAll ? "rotate-180" : ""}`} />
           </button>
         )}
       </div>
 
-      <div className="flex-1 space-y-4 overflow-y-auto pr-2 custom-scrollbar">
+      {/* Scrollable List */}
+      <div className="flex-1 min-h-0 overflow-y-auto pr-1 space-y-4">
         <AnimatePresence mode="popLayout">
           {displayedData.map(({ length, algos }) => (
-            <motion.div key={length} layout initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} className="space-y-2">
-              <div className="flex items-center gap-2 px-2">
-                <span className="text-[10px] font-black text-cyan-500/50 uppercase tracking-tighter">{length} Moves</span>
+            <motion.div key={length} layout initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="space-y-2">
+              {/* Length Divider */}
+              <div className="flex items-center gap-2">
+                <span className="text-[10px] uppercase text-cyan-400/60">{length} Moves</span>
                 <div className="h-px flex-1 bg-white/5" />
               </div>
 
+              {/* Algorithms */}
               {algos.slice(0, 5).map((algo, idx) => {
                 const id = `${length}-${idx}`;
                 const moveStr = Array.isArray(algo?.moves) ? algo.moves.join(" ") : String(algo?.moves || "");
 
                 return (
-                  <motion.div key={id} whileHover={{ x: 4 }} className="group flex items-center justify-between p-3 bg-white/5 hover:bg-white/10 rounded-2xl border border-white/5 transition-all">
-                    <code className="text-[11px] font-mono text-slate-300 truncate pr-4">{moveStr}</code>
+                  <motion.div key={id} layout className="group flex items-center justify-between px-3 py-2 rounded-lg bg-[#1A2138]/60 border border-white/5 hover:border-white/10 transition">
+                    <code className="text-[11px] font-mono text-white/80 truncate pr-3">{moveStr}</code>
+
                     <div className="flex gap-1 shrink-0">
-                      <Button onClick={() => handleCopy(algo?.moves, id)} variant="ghost" size="sm" className="h-8 w-8 rounded-lg hover:bg-cyan-500/20">
-                        {copiedId === id ? <Check className="w-3 h-3 text-green-400" /> : <Copy className="w-3 h-3 text-slate-400" />}
+                      <Button onClick={() => handleCopy(algo?.moves, id)} variant="ghost" size="sm" className="h-7 w-7 rounded-md hover:bg-cyan-500/20">
+                        {copiedId === id ? <Check className="w-3 h-3 text-green-400" /> : <Copy className="w-3 h-3 text-white/50" />}
                       </Button>
-                      <Button onClick={() => handlePlay(algo?.moves)} variant="ghost" size="sm" className="h-8 w-8 rounded-lg hover:bg-cyan-500/20">
-                        <Play className="w-3 h-3 text-cyan-400 fill-cyan-400/20" />
+
+                      <Button onClick={() => handlePlay(algo?.moves)} variant="ghost" size="sm" className="h-7 w-7 rounded-md hover:bg-cyan-500/20">
+                        <Play className="w-3 h-3 text-cyan-400" />
                       </Button>
                     </div>
                   </motion.div>

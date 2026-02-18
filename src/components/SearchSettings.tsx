@@ -26,7 +26,7 @@ type InputMode = "text" | "visual" | "camera";
 export function SearchSettings({ puzzleSize, setPuzzleSize, onOpenColorPicker, onOpenCamera }: SearchSettingsProps) {
   const { scrambleNotation, maxDepth, allowedMoves, setMaxDepth, toggleMove, setSolutions, setSearching, setScramble, isSearching } = useCubeStore();
 
-  // const [isSearching, setIsSearching] = useState(false);
+  const [isLocalSearching, setIsLocalSearching] = useState(false);
   const [inputMode, setInputMode] = useState<InputMode>("text");
   const [showColorPicker, setShowColorPicker] = useState(false);
   const [showCamera, setShowCamera] = useState(false);
@@ -95,9 +95,10 @@ export function SearchSettings({ puzzleSize, setPuzzleSize, onOpenColorPicker, o
 
     // 1. Clear UI state immediately
     setSolutions({});
-    // setIsSearching(true);
+    setIsLocalSearching(true);
     setSearching(true);
 
+    await new Promise((resolve) => setTimeout(resolve, 0));
     try {
       const enabledMoves = Object.entries(allowedMoves)
         .filter(([_, enabled]) => enabled)
@@ -129,6 +130,8 @@ export function SearchSettings({ puzzleSize, setPuzzleSize, onOpenColorPicker, o
       console.error("Solver execution failed:", error);
     } finally {
       // setIsSearching(false);
+
+      setIsLocalSearching(false);
       setSearching(false);
     }
   };
@@ -143,134 +146,124 @@ export function SearchSettings({ puzzleSize, setPuzzleSize, onOpenColorPicker, o
 
   return (
     <>
-      <div className="space-y-4">
-        {/* Input Mode Selector */}
-        <div className="space-y-4">
-          <label className="flex block text-sm font-bold text-cyan-300 mb-3 gap-2">
-            <Palette className="w-4 h-4" />
+      {isLocalSearching && (
+        <div className="fixed inset-0 z-40 pointer-events-none">
+          <div className="absolute inset-0 bg-black/20 backdrop-blur-[2px]" />
+        </div>
+      )}
+
+      <div className="space-y-3 text-sm">
+        {/* INPUT METHOD */}
+        <div>
+          <label className="flex items-center gap-2 text-xs font-semibold text-cyan-400 mb-2">
+            <Palette className="w-3 h-3" />
             Input Method
           </label>
 
           <div className="grid grid-cols-3 gap-2">
-            <motion.button whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} onClick={() => setInputMode("text")} className={`p-3 rounded-xl border transition-all ${inputMode === "text" ? "border-cyan-400 bg-cyan-400/20 text-cyan-300" : "border-white/10 bg-white/5 text-white/60 hover:bg-white/10"}`}>
-              <Keyboard className="w-5 h-5 mx-auto mb-1" />
-              <span className="text-xs font-semibold">Text</span>
-            </motion.button>
-
-            <motion.button
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              onClick={() => {
-                setInputMode("visual");
-                onOpenColorPicker();
-                setShowColorPicker(true);
-              }}
-              className={`p-3 rounded-xl border transition-all ${inputMode === "visual" ? "border-purple-400 bg-purple-400/20 text-purple-300" : "border-white/10 bg-white/5 text-white/60 hover:bg-white/10"}`}
-            >
-              <Grid3x3 className="w-5 h-5 mx-auto mb-1" />
-              <span className="text-xs font-semibold">Visual</span>
-            </motion.button>
-
-            <motion.button
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              onClick={() => {
-                setInputMode("camera");
-                setShowCamera(true);
-                onOpenCamera();
-              }}
-              className={`p-3 rounded-xl border transition-all ${inputMode === "camera" ? "border-pink-400 bg-pink-400/20 text-pink-300" : "border-white/10 bg-white/5 text-white/60 hover:bg-white/10"}`}
-            >
-              <Camera className="w-5 h-5 mx-auto mb-1" />
-              <span className="text-xs font-semibold">Camera</span>
-            </motion.button>
+            {[
+              { key: "text", icon: Keyboard, label: "Text" },
+              { key: "visual", icon: Grid3x3, label: "Visual" },
+              { key: "camera", icon: Camera, label: "Camera" },
+            ].map(({ key, icon: Icon, label }) => (
+              <button
+                key={key}
+                onClick={() => {
+                  setInputMode(key as InputMode);
+                  if (key === "visual") {
+                    setShowColorPicker(true);
+                    // onOpenColorPicker();
+                  }
+                  if (key === "camera") {
+                    setShowCamera(true);
+                    // onOpenCamera();
+                  }
+                }}
+                className={`flex flex-col items-center justify-center py-2 rounded-lg border text-xs transition
+                ${inputMode === key ? "border-cyan-500 bg-cyan-500/10 text-cyan-400" : "border-white/10 bg-white/5 text-white/60 hover:bg-white/10"}`}
+              >
+                <Icon className="w-4 h-4 mb-1" />
+                {label}
+              </button>
+            ))}
           </div>
         </div>
 
-        {/* Puzzle Selector */}
-        <div>
-          <label className="block text-sm font-bold text-cyan-300 mb-2">Puzzle Type</label>
-          <PuzzleSelector value={puzzleSize} onValueChange={setPuzzleSize} />
+        <div className="grid grid-cols-2 gap-4">
+          {/* PUZZLE TYPE */}
+          <div>
+            <label className="text-xs font-semibold text-cyan-400 mb-1 block">Puzzle Type</label>
+            <PuzzleSelector value={puzzleSize} onValueChange={setPuzzleSize} />
+          </div>
+
+          {/* MAX DEPTH */}
+          <div>
+            <div className="flex items-center justify-between mb-1">
+              <label className="text-xs font-semibold text-cyan-400">Max Length</label>
+              <span className="text-xs font-mono bg-cyan-500/10 text-cyan-400 px-2 py-0.5 rounded">{maxDepth}</span>
+            </div>
+
+            <input type="range" min={5} max={20} value={maxDepth} onChange={(e) => setMaxDepth(+e.target.value)} className="w-full h-1 accent-cyan-500" />
+
+            <div className="flex justify-between text-[10px] text-white/40">
+              <span>5</span>
+              <span>20</span>
+            </div>
+          </div>
         </div>
 
-        {/* Max Depth */}
-        <div>
-          <div className="flex items-center justify-between mb-2">
-            <label className="text-sm font-bold text-cyan-300">Max Solution Length</label>
-            <span className="text-lg font-bold text-white bg-cyan-400/20 px-3 py-1 rounded-lg">{maxDepth}</span>
+        {/* ALLOWED MOVES */}
+        <div className="space-y-3 rounded-xl bg-[#1A2138]/60 p-3">
+          <div className="flex items-center justify-between">
+            <span className="text-s font-semibold text-purple-400">Allowed Moves</span>
+            <span className="text-[10px] text-white/40">{selectedCount} / 4</span>
           </div>
-          <input type="range" min={5} max={20} value={maxDepth} onChange={(e) => setMaxDepth(+e.target.value)} className="w-full h-2 bg-white/10 rounded-lg appearance-none cursor-pointer accent-cyan-400" />
-          <div className="flex justify-between text-xs text-white/40 mt-1">
-            <span>5</span>
-            <span>20</span>
-          </div>
+
+          {Object.entries(moveGroups).map(([groupName, moves]) => (
+            <div key={groupName}>
+              <div className="text-[12px] uppercase text-white/40 mb-1">{groupName}</div>
+
+              <div className="flex flex-wrap gap-1.5">
+                {moves.map((move) => {
+                  const isSelected = allowedMoves[move];
+                  const isDisabled = !isSelected && selectedCount >= 4;
+
+                  return (
+                    <button
+                      key={move}
+                      disabled={isDisabled}
+                      onClick={() => toggleMove(move)}
+                      className={`flex-1 min-w-[48px] py-1.5 text-xs font-mono rounded-md border transition text-center
+  ${isSelected ? "bg-cyan-500/20 border-cyan-500 text-cyan-400" : "bg-white/5 border-white/10 text-white/60 hover:bg-white/10"}
+  ${isDisabled ? "opacity-30 cursor-not-allowed" : ""}
+`}
+                    >
+                      {move}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          ))}
         </div>
 
-        {/* Advanced Settings Toggle */}
-        <button onClick={() => setShowAdvanced(!showAdvanced)} className="w-full flex items-center justify-between p-3 bg-white/5 hover:bg-white/10 rounded-xl transition-colors text-white/80">
-          <span className="flex items-center gap-2 text-sm font-semibold">
-            <Settings className="w-4 h-4" />
-            Advanced Settings
-          </span>
-          <ChevronDown className={`w-4 h-4 transition-transform ${showAdvanced ? "rotate-180" : ""}`} />
+        {/* SEARCH BUTTON */}
+        <button disabled={isLocalSearching || !scrambleNotation.trim()} onClick={handleSearch} className="relative w-full py-2.5 rounded-lg bg-gradient-to-r from-cyan-500 to-blue-500 text-sm font-semibold text-white hover:opacity-90 transition disabled:opacity-70 disabled:cursor-not-allowed">
+          {isLocalSearching ? (
+            <span className="flex items-center justify-center gap-2">
+              <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+              Searching...
+            </span>
+          ) : (
+            "Find Solutions"
+          )}
         </button>
 
-        {/* Advanced Settings - Allowed Moves */}
-        <AnimatePresence>
-          {showAdvanced && (
-            <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }} exit={{ height: 0, opacity: 0 }} className="overflow">
-              <div className="space-y-3 pt-2">
-                <div className="flex items-center justify-between">
-                  <label className="text-sm font-bold text-purple-300">Allowed Moves</label>
-                  <span className="text-xs text-white/60">{selectedCount} selected (max 4)</span>
-                </div>
-
-                {Object.entries(moveGroups).map(([groupName, moves]) => (
-                  <div key={groupName} className="bg-white/5 rounded-xl p-3">
-                    <div className="text-xs font-bold text-white/60 mb-2">{groupName}</div>
-                    <div className="flex flex-wrap gap-2">
-                      {moves.map((move) => {
-                        const isSelected = allowedMoves[move];
-                        const isDisabled = !isSelected && selectedCount >= 4;
-
-                        return (
-                          <motion.button key={move} whileHover={!isDisabled ? { scale: 1.1 } : {}} whileTap={!isDisabled ? { scale: 0.9 } : {}} disabled={isDisabled} onClick={() => toggleMove(move)} className={`px-4 py-2 rounded-lg font-mono font-bold text-sm transition-all ${isSelected ? "bg-gradient-to-r from-cyan-500 to-blue-500 text-white shadow-lg shadow-cyan-500/30" : "bg-white/10 text-white/60 hover:bg-white/20"} ${isDisabled ? "opacity-30 cursor-not-allowed" : "cursor-pointer"}`}>
-                            {move}
-                          </motion.button>
-                        );
-                      })}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
-
-        {/* Search Button */}
-        <motion.button whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} disabled={isSearching || !scrambleNotation.trim()} onClick={handleSearch} className="w-full py-4 bg-gradient-to-r from-cyan-500 via-blue-500 to-purple-500 hover:from-cyan-600 hover:via-blue-600 hover:to-purple-600 text-white rounded-xl font-bold text-lg shadow-lg hover:shadow-cyan-500/50 transition-all disabled:opacity-50 disabled:cursor-not-allowed relative  group">
-          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent translate-x-[-200%] group-hover:translate-x-[200%] transition-transform duration-1000" />
-          <span className="relative flex items-center justify-center gap-2">
-            {isSearching ? (
-              <>
-                <div className="w-5 h-5 border-3 border-white/30 border-t-white rounded-full animate-spin" />
-                Searching...
-              </>
-            ) : (
-              <>
-                <Search className="w-5 h-5" />
-                Find Solutions
-                <Zap className="w-5 h-5" />
-              </>
-            )}
-          </span>
-        </motion.button>
-
-        {/* Info Text */}
-        <p className="text-xs text-white/50 text-center">
-          {inputMode === "text" && "Enter scramble notation or use visual input"}
-          {inputMode === "visual" && "Click stickers to set cube state visually"}
-          {inputMode === "camera" && "Use camera to scan your physical cube"}
+        {/* INFO TEXT */}
+        <p className="text-[10px] text-white/40 text-center">
+          {inputMode === "text" && "Enter scramble notation"}
+          {inputMode === "visual" && "Set cube stickers visually"}
+          {inputMode === "camera" && "Scan your cube"}
         </p>
       </div>
 
@@ -295,13 +288,9 @@ export function SearchSettings({ puzzleSize, setPuzzleSize, onOpenColorPicker, o
 
             <AnimatePresence>
               {showCamera && (
-                <CameraInput
-                  onComplete={handleVisualInputComplete}
-                  onCancel={() => {
-                    onOpenCamera();
-                    setShowCamera(false);
-                  }}
-                />
+                <ModalRoot>
+                  <CameraInput puzzleSize={puzzleSize} onComplete={handleVisualInputComplete} onCancel={() => setShowCamera(false)} />
+                </ModalRoot>
               )}
             </AnimatePresence>
           </motion.div>
