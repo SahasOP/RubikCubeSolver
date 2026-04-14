@@ -1,17 +1,20 @@
 declare module "cubejs" {
-  interface CubeInstance {
-    solve(): string;
+  export interface CubeInstance {
+    move(moves: string): void;
+    solve(maxDepth?: number): string;
     isSolved(): boolean;
-    scramble(n: number): void;
-    random(n: number): void;
+    scramble(n?: number): void;
+    random(n?: number): void;
+    asString(): string;
   }
 
-  interface CubeStatic {
+  export interface CubeClass {
+    new (): CubeInstance;
+    new (state: any): CubeInstance;
     initSolver(): void;
     fromString(facelets: string): CubeInstance;
-    fromCommands(commands: string): CubeInstance;
   }
 
-  const Cube: CubeStatic;
+  const Cube: CubeClass;
   export default Cube;
 }

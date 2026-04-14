@@ -102,43 +102,33 @@ export default function PracticePage() {
       data: { user },
     } = await supabase.auth.getUser();
 
-    if (!user) return;
+    if (!user) {
+      setLoading(false);
+      return;
+    }
 
-    setUser(user);
+    setUser(user as any);
 
     // Fetch profile
     const { data: profile } = await supabase.from("profiles").select("name").eq("id", user.id).single();
 
     // Fetch solves
-    const { data: solves } = await supabase.from("solves").select("time, scramble, created_at").eq("user_id", user.id).order("created_at", { ascending: false });
+    const { data: dbSolves } = await supabase.from("solves").select("time, scramble, created_at").eq("user_id", user.id).order("created_at", { ascending: false }).limit(50);
 
-    if (solves?.length) {
-      calculateStats(solves);
-      setHistory(solves.slice(0, 10));
+    if (dbSolves?.length) {
+      setSolves(
+        dbSolves.map((s) => ({
+          time: s.time,
+          scramble: s.scramble,
+          createdAt: new Date(s.created_at).getTime(),
+        }))
+      );
     }
 
-    setUser((prev) => ({ ...prev, name: profile?.name }));
+    setUser((prev: any) => ({ ...prev, name: profile?.name }));
     setLoading(false);
   };
-  const calculateStats = (solves) => {
-    const times = solves.map((s) => s.time);
 
-    const avg = (times.reduce((a, b) => a + b, 0) / times.length).toFixed(2);
-
-    const best = Math.min(...times).toFixed(2);
-
-    const ao5 = times.length >= 5 ? (times.slice(0, 5).reduce((a, b) => a + b, 0) / 5).toFixed(2) : "-";
-
-    const ao12 = times.length >= 12 ? (times.slice(0, 12).reduce((a, b) => a + b, 0) / 12).toFixed(2) : "-";
-
-    setStats({
-      total: times.length,
-      best,
-      avg,
-      ao5,
-      ao12,
-    });
-  };
   const logout = async () => {
     await supabase.auth.signOut();
     window.location.reload();
@@ -373,6 +363,12 @@ export default function PracticePage() {
                 <Zap className="w-5 h-5 text-yellow-400" />
                 Settings
               </h3>
+              
+              {!user && (
+                 <div className="mb-4 bg-orange-500/10 border border-orange-500/20 text-orange-400 p-3 rounded-xl text-xs font-semibold">
+                   Guest Mode: Solves are saved locally for this session. Log in to track performance.
+                 </div>
+              )}
 
               <div className="space-y-4">
                 {/* Scramble Length */}

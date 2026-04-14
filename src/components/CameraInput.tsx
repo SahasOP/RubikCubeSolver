@@ -16,8 +16,7 @@ interface DetectedCubeState {
 
 interface CameraInputProps {
   onComplete: (cubeState: any) => void;
-  onCa
-  ncel: () => void;
+  onCancel: () => void;
 }
 const COLOR_TO_FACE: Record<Color, CubeFace> = {
   white: "U",
@@ -73,15 +72,15 @@ export const CameraInput = ({ onComplete, onCancel }: CameraInputProps) => {
     const captured = capturedFaces.find((f) => f.face === face);
     const colors = captured
       ? captured.colors.map((r) => [...r])
-      : [
+      : ([
           ["white", "white", "white"],
           ["white", "white", "white"],
           ["white", "white", "white"],
-        ];
+        ] as Color[][]);
     setEditingFace(face);
     setEditingColors(colors);
     setEditingCell({ row, col });
-    setPaletteSelected(colors[row][col]);
+    setPaletteSelected(colors[row][col] as Color);
   };
 
   // Open full-face editor
@@ -550,15 +549,16 @@ function rgbToHsv(r: number, g: number, b: number) {
   return { h, s, v };
 }
 function classifyColor(h: number, s: number, v: number): Color {
-  if (v < 0.2) return "blue"; // shadow fallback
+  // Enhanced heuristic for varying lighting conditions
+  if (v < 0.15) return "blue"; // Deep shadow fallback
 
-  if (s < 0.25 && v > 0.7) return "white";
+  if (s < 0.35 && v > 0.6) return "white"; // More forgiving saturation for white
 
   if (h < 15 || h > 345) return "red";
   if (h >= 15 && h < 45) return "orange";
-  if (h >= 45 && h < 80) return "yellow";
-  if (h >= 80 && h < 160) return "green";
-  if (h >= 160 && h < 260) return "blue";
+  if (h >= 45 && h < 90) return "yellow";
+  if (h >= 90 && h < 170) return "green";
+  if (h >= 170 && h < 270) return "blue";
 
   return "white";
 }
