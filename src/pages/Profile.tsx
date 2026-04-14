@@ -216,17 +216,13 @@ const Profile = () => {
 
   if (loading)
     return (
-      <div className="min-h-screen bg-[#020617] text-white flex items-center justify-center">
-        <motion.div animate={{ rotate: 360 }} transition={{ repeat: Infinity, duration: 2 }} className="w-10 h-10 border-4 border-cyan-500/20 border-t-cyan-500 rounded-full" />
+      <div className="flex-grow flex items-center justify-center">
+        <motion.div animate={{ rotate: 360 }} transition={{ repeat: Infinity, duration: 2, ease: "linear" }} className="w-10 h-10 border-4 border-cyan-500/20 border-t-cyan-500 rounded-full" />
       </div>
     );
 
   return (
-    <div className="min-h-screen bg-[#020617] text-slate-100 p-8 font-sans selection:bg-cyan-500/30 relative overflow-hidden">
-      {/* Background Decor */}
-      <div className="absolute top-0 left-1/4 w-[500px] h-[500px] bg-indigo-600/10 blur-[120px] rounded-full pointer-events-none" />
-      <div className="absolute bottom-0 right-1/4 w-[500px] h-[500px] bg-cyan-600/10 blur-[120px] rounded-full pointer-events-none" />
-
+    <div className="relative w-full p-8 font-sans">
       <main className="max-w-7xl mx-auto relative z-10">
         {/* Header Header */}
         <header className="flex justify-between items-end mb-12">

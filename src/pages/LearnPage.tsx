@@ -6,6 +6,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { BookOpen, Code, Dumbbell, Search, Filter, TrendingUp, Trophy, Target, Sparkles, GraduationCap } from "lucide-react";
 import { AlgorithmCard } from "../components/AlgorithmCard";
 import { LessonViewer } from "../components/LessonViewer";
+import { AlgorithmDrillMode, TimedChallengeMode } from "../components/PracticeModes";
 import { ALGORITHMS, LESSONS } from "../data/algorithms";
 import { Algorithm, Lesson, DifficultyLevel, AlgorithmCategory } from "../types/learning";
 
@@ -19,6 +20,7 @@ export default function LearnPage() {
   const [selectedCategory, setSelectedCategory] = useState<AlgorithmCategory | "all">("all");
   const [masteredAlgs, setMasteredAlgs] = useState<Set<string>>(new Set());
   const [completedLessons, setCompletedLessons] = useState<Set<string>>(new Set());
+  const [practiceMode, setPracticeMode] = useState<"menu" | "drill" | "timed">("menu");
 
   // Filter algorithms
   const filteredAlgorithms = useMemo(() => {
@@ -50,40 +52,7 @@ export default function LearnPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-indigo-950 to-slate-950 relative overflow-hidden">
-      {/* Animated Background */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <motion.div
-          className="absolute -top-1/2 -left-1/2 w-full h-full bg-gradient-to-br from-cyan-500/10 via-purple-500/10 to-pink-500/10 rounded-full blur-3xl"
-          animate={{
-            x: [0, 100, 0],
-            y: [0, 50, 0],
-            rotate: [0, 90, 0],
-          }}
-          transition={{
-            duration: 20,
-            repeat: Infinity,
-            ease: "linear",
-          }}
-        />
-        <motion.div
-          className="absolute -bottom-1/2 -right-1/2 w-full h-full bg-gradient-to-tl from-blue-500/10 via-indigo-500/10 to-violet-500/10 rounded-full blur-3xl"
-          animate={{
-            x: [0, -100, 0],
-            y: [0, -50, 0],
-            rotate: [0, -90, 0],
-          }}
-          transition={{
-            duration: 25,
-            repeat: Infinity,
-            ease: "linear",
-          }}
-        />
-      </div>
-
-      {/* Grid Pattern */}
-      <div className="absolute inset-0 bg-[linear-gradient(to_right,#ffffff03_1px,transparent_1px),linear-gradient(to_bottom,#ffffff03_1px,transparent_1px)] bg-[size:4rem_4rem] pointer-events-none" />
-
+    <div className="relative w-full">
       <div className="relative z-10 container mx-auto px-4 py-8">
         {/* Header */}
         <motion.div initial={{ opacity: 0, y: -30 }} animate={{ opacity: 1, y: 0 }} className="text-center mb-12">
@@ -112,17 +81,18 @@ export default function LearnPage() {
 
         {/* Tab Navigation */}
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="flex justify-center mb-8">
-          <div className="bg-white/5 backdrop-blur-xl rounded-2xl p-2 border border-white/10 inline-flex gap-2">
+          <div className="bg-white/5 backdrop-blur-xl rounded-2xl p-2 border border-white/10 flex flex-wrap justify-center gap-2">
             <TabButton
               active={activeTab === "lessons"}
               onClick={() => {
                 setActiveTab("lessons");
                 setSelectedLesson(null);
+                setPracticeMode("menu");
               }}
               icon={<BookOpen className="w-5 h-5" />}
               label="Lessons"
             />
-            <TabButton active={activeTab === "algorithms"} onClick={() => setActiveTab("algorithms")} icon={<Code className="w-5 h-5" />} label="Algorithms" />
+            <TabButton active={activeTab === "algorithms"} onClick={() => { setActiveTab("algorithms"); setPracticeMode("menu"); }} icon={<Code className="w-5 h-5" />} label="Algorithms" />
             <TabButton active={activeTab === "practice"} onClick={() => setActiveTab("practice")} icon={<Dumbbell className="w-5 h-5" />} label="Practice" />
           </div>
         </motion.div>
@@ -201,18 +171,24 @@ export default function LearnPage() {
           )}
 
           {activeTab === "practice" && (
-            <motion.div key="practice" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }} className="text-center py-20">
-              <Dumbbell className="w-24 h-24 mx-auto mb-6 text-purple-400 opacity-50" />
-              <h2 className="text-3xl font-bold text-white mb-4">Practice Mode</h2>
-              <p className="text-white/60 mb-8 max-w-2xl mx-auto">Test your knowledge with random algorithms and timed challenges. Coming soon!</p>
-              <div className="flex justify-center gap-4">
-                <motion.button whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} className="px-8 py-4 bg-gradient-to-r from-cyan-500 to-blue-500 text-white rounded-xl font-semibold shadow-lg hover:shadow-cyan-500/50 transition-shadow">
-                  Random Algorithm Drill
-                </motion.button>
-                <motion.button whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} className="px-8 py-4 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-xl font-semibold shadow-lg hover:shadow-purple-500/50 transition-shadow">
-                  Timed Challenge
-                </motion.button>
-              </div>
+            <motion.div key="practice" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }} className="w-full">
+              {practiceMode === "menu" && (
+                <div className="text-center py-20">
+                  <Dumbbell className="w-24 h-24 mx-auto mb-6 text-purple-400 opacity-50" />
+                  <h2 className="text-3xl font-bold text-white mb-4">Practice Mode</h2>
+                  <p className="text-white/60 mb-8 max-w-2xl mx-auto">Test your knowledge and reflexes. Choose a drill to train your algorithm recall.</p>
+                  <div className="flex justify-center gap-4 flex-wrap">
+                    <motion.button onClick={() => setPracticeMode("drill")} whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} className="px-8 py-4 bg-gradient-to-r from-cyan-500 to-blue-500 text-white rounded-xl font-semibold shadow-lg hover:shadow-cyan-500/50 transition-shadow">
+                      Random Algorithm Drill
+                    </motion.button>
+                    <motion.button onClick={() => setPracticeMode("timed")} whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} className="px-8 py-4 bg-gradient-to-r from-yellow-500 to-orange-500 text-white rounded-xl font-semibold shadow-lg hover:shadow-yellow-500/50 transition-shadow">
+                      Timed Challenge
+                    </motion.button>
+                  </div>
+                </div>
+              )}
+              {practiceMode === "drill" && <AlgorithmDrillMode onExit={() => setPracticeMode("menu")} />}
+              {practiceMode === "timed" && <TimedChallengeMode onExit={() => setPracticeMode("menu")} />}
             </motion.div>
           )}
         </AnimatePresence>

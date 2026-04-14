@@ -76,13 +76,7 @@ const Index = () => {
   }, [scrambleNotation, setSolutions, setSolution]);
 
   return (
-    <div className="  bg-[#020617] text-slate-200 selection:bg-cyan-500/30 selection:text-cyan-200 overflow-x-hidden">
-      {/* Dynamic Background: "The Vapor Layer" */}
-      <div className="fixed inset-0 pointer-events-none">
-        <motion.div variants={glowVariants} animate="animate" className="absolute top-[-10%] left-[-10%] w-[60%] h-[60%] bg-indigo-600/10 blur-[140px] rounded-full" />
-        <motion.div variants={glowVariants} animate="animate" className="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] bg-cyan-500/10 blur-[140px] rounded-full" />
-        <div className="absolute inset-0 opacity-[0.03] bg-[url('https://grainy-gradients.vercel.app/noise.svg')] brightness-100 contrast-150" />
-      </div>
+    <div className="w-full">
 
       <main className=" mx-auto px-6 py-6 relative z-10">
         <motion.div initial="hidden" animate="visible" variants={panelVariants} className="grid grid-cols-12 gap-8">

@@ -320,32 +320,15 @@ export default function PracticePage() {
 
   /* ---------------- UI RENDER ---------------- */
 
-  if (loading) return <div className="min-h-screen bg-[#0f172a] text-white flex items-center justify-center">Loading profile...</div>;
+  if (loading)
+    return (
+      <div className="flex-grow flex items-center justify-center">
+        <motion.div animate={{ rotate: 360 }} transition={{ repeat: Infinity, duration: 2, ease: "linear" }} className="w-10 h-10 border-4 border-cyan-500/20 border-t-cyan-500 rounded-full" />
+      </div>
+    );
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-indigo-950 to-slate-950 relative overflow-hidden">
-      {/* Animated Background */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <motion.div
-          className="absolute top-0 left-1/4 w-96 h-96 bg-gradient-to-br from-cyan-500/10 to-transparent rounded-full blur-3xl"
-          animate={{
-            y: [0, 100, 0],
-            x: [0, 50, 0],
-          }}
-          transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
-        />
-        <motion.div
-          className="absolute bottom-0 right-1/4 w-96 h-96 bg-gradient-to-tl from-purple-500/20 to-transparent rounded-full blur-3xl"
-          animate={{
-            y: [0, -100, 0],
-            x: [0, -50, 0],
-          }}
-          transition={{ duration: 25, repeat: Infinity, ease: "linear" }}
-        />
-      </div>
-
-      {/* Grid overlay */}
-      <div className="absolute inset-0 bg-[linear-gradient(to_right,#ffffff05_1px,transparent_1px),linear-gradient(to_bottom,#ffffff05_1px,transparent_1px)] bg-[size:3rem_3rem] pointer-events-none" />
+    <div className="relative w-full">
 
       <div className="relative z-10 container mx-auto px-4 py-8">
         {/* Header */}
