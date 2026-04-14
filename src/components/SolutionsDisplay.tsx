@@ -46,9 +46,12 @@ export function SolutionsDisplay({ setIsAutoPlay, setPlayerKey }: SolutionsDispl
 
   if (sortedData.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center py-10 text-center">
-        <Sparkles className="w-8 h-8 text-white/20 mb-3" />
-        <p className="text-xs uppercase tracking-widest text-white/40">Waiting for search...</p>
+      <div className="flex flex-col items-center justify-center h-[200px] text-center relative overflow-hidden rounded-3xl border border-white/5 bg-black/20 p-8 mt-2">
+        <motion.div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-cyan-500/10 via-transparent to-transparent opacity-50" animate={{ scale: [1, 1.2, 1], opacity: [0.3, 0.6, 0.3] }} transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }} />
+        <motion.div animate={{ y: [-4, 4, -4] }} transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }} className="relative z-10">
+          <Sparkles className="w-10 h-10 text-cyan-400 mb-4 drop-shadow-[0_0_15px_rgba(6,182,212,0.6)] mx-auto" />
+        </motion.div>
+        <p className="text-[10px] font-black uppercase tracking-[0.3em] text-cyan-300/40 relative z-10">Awaiting Sequences...</p>
       </div>
     );
   }
@@ -81,8 +84,9 @@ export function SolutionsDisplay({ setIsAutoPlay, setPlayerKey }: SolutionsDispl
                 const moveStr = Array.isArray(algo?.moves) ? algo.moves.join(" ") : String(algo?.moves || "");
 
                 return (
-                  <motion.div key={id} layout className="group flex items-center justify-between px-3 py-2 rounded-lg bg-[#1A2138]/60 border border-white/5 hover:border-white/10 transition">
-                    <code className="text-[11px] font-mono text-white/80 truncate pr-3">{moveStr}</code>
+                  <motion.div key={id} layout className="group flex items-center justify-between px-4 py-3 rounded-xl bg-white/5 border border-white/5 hover:border-cyan-500/30 hover:bg-cyan-500/10 transition-all text-sm shadow-sm hover:shadow-[0_0_15px_rgba(6,182,212,0.15)] overflow-hidden relative">
+                    <div className="absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-cyan-500/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                    <code className="text-xs font-mono font-semibold text-cyan-100/80 group-hover:text-cyan-300 transition-colors truncate pr-3">{moveStr}</code>
 
                     <div className="flex gap-1 shrink-0">
                       <Button onClick={() => handleCopy(algo?.moves, id)} variant="ghost" size="sm" className="h-7 w-7 rounded-md hover:bg-cyan-500/20">

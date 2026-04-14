@@ -179,8 +179,8 @@ export function SearchSettings({ puzzleSize, setPuzzleSize, onOpenColorPicker, o
                     // onOpenCamera();
                   }
                 }}
-                className={`flex flex-col items-center justify-center py-2 rounded-lg border text-xs transition
-                ${inputMode === key ? "border-cyan-500 bg-cyan-500/10 text-cyan-400" : "border-white/10 bg-white/5 text-white/60 hover:bg-white/10"}`}
+                className={`flex flex-col items-center justify-center py-3 rounded-xl border text-xs font-semibold transition-all duration-300 transform active:scale-95
+                ${inputMode === key ? "border-cyan-500 bg-cyan-500/20 text-cyan-400 shadow-[0_0_15px_rgba(6,182,212,0.3)]" : "border-white/5 bg-white/5 text-white/50 hover:bg-white/10 hover:border-white/10 hover:text-white"}`}
               >
                 <Icon className="w-4 h-4 mb-1" />
                 {label}
@@ -213,7 +213,7 @@ export function SearchSettings({ puzzleSize, setPuzzleSize, onOpenColorPicker, o
         </div>
 
         {/* ALLOWED MOVES */}
-        <div className="space-y-3 rounded-xl bg-[#1A2138]/60 p-3">
+        <div className="space-y-1 rounded-2xl bg-black/30 backdrop-blur-md border border-white/5 p-4 shadow-inner mt-4">
           <div className="flex items-center justify-between">
             <span className="text-s font-semibold text-purple-400">Allowed Moves</span>
             <span className="text-[10px] text-white/40">{selectedCount} / 4</span>
@@ -248,19 +248,26 @@ export function SearchSettings({ puzzleSize, setPuzzleSize, onOpenColorPicker, o
         </div>
 
         {/* SEARCH BUTTON */}
-        <button disabled={isLocalSearching || !scrambleNotation.trim()} onClick={handleSearch} className="relative w-full py-2.5 rounded-lg bg-gradient-to-r from-cyan-500 to-blue-500 text-sm font-semibold text-white hover:opacity-90 transition disabled:opacity-70 disabled:cursor-not-allowed">
+        <button disabled={isLocalSearching || !scrambleNotation.trim()} onClick={handleSearch} className="relative w-full overflow-hidden group py-2 mt-4 rounded-2xl bg-gradient-to-r from-cyan-500 via-blue-500 to-indigo-500 text-sm font-black uppercase tracking-widest text-white shadow-[0_0_20px_rgba(6,182,212,0.3)] transition-all transform hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 disabled:scale-100 disabled:shadow-none disabled:cursor-not-allowed">
+          {isLocalSearching && (
+            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full animate-[shimmer_1.5s_infinite]" />
+          )}
+
           {isLocalSearching ? (
-            <span className="flex items-center justify-center gap-2">
+            <span className="relative z-10 flex items-center justify-center gap-3">
               <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-              Searching...
+              Searching Logic...
             </span>
           ) : (
-            "Find Solutions"
+            <span className="relative z-10 flex items-center justify-center gap-2">
+              <Grid3x3 className="w-5 h-5 opacity-70" />
+              Find Solutions
+            </span>
           )}
         </button>
 
         {/* INFO TEXT */}
-        <p className="text-[10px] text-white/40 text-center">
+        <p className="text-[9px] text-white/40 text-center">
           {inputMode === "text" && "Enter scramble notation"}
           {inputMode === "visual" && "Set cube stickers visually"}
           {inputMode === "camera" && "Scan your cube"}

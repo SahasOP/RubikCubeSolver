@@ -25,9 +25,9 @@ export function ScrambleInput() {
           </TooltipProvider>
         </label>
 
-        <Button onClick={generateRandomScramble} variant="outline" size="sm" className="h-7 px-2.5 text-xs border-white/10 hover:border-white/20">
-          <Shuffle className="mr-1 h-3 w-3" />
-          Random
+        <Button onClick={generateRandomScramble} variant="ghost" size="sm" className="h-8 px-4 text-xs font-bold bg-cyan-500/10 text-cyan-400 border border-cyan-500/30 hover:bg-cyan-500/20 hover:scale-105 hover:text-cyan-300 transition-all rounded-xl shadow-[0_0_15px_rgba(6,182,212,0.1)]">
+          <Shuffle className="mr-1.5 h-3.5 w-3.5" />
+          Randomize
         </Button>
       </div>
 
@@ -42,7 +42,7 @@ export function ScrambleInput() {
         }}
         rows={1}
         placeholder="R U R' U' F2 D L2 B2..."
-        className="min-h-[44px] max-h-[160px] resize-none overflow-hidden rounded-xl border border-white/10 bg-[#1A2138] font-mono text-sm text-white placeholder:text-white/40 focus:border-cyan-500 focus:ring-0"
+        className="min-h-[44px] max-h-[160px] resize-none overflow-hidden rounded-xl border border-white/10 bg-black/30 backdrop-blur-xl font-mono text-sm text-cyan-50 shadow-inner placeholder:text-white/30 focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500/50 transition-all p-3 leading-relaxed"
       />
 
       {/* Helper */}

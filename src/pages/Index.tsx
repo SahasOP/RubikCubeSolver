@@ -40,7 +40,8 @@ const SpatialCard = ({
   icon?: any;
   className?: string;
 }>) => (
-  <motion.div variants={panelVariants} whileHover={{ y: -2 }} className={`rounded-2xl border border-white/10 bg-[#111827] p-5 shadow-md ${className}`}>
+  <motion.div variants={panelVariants} whileHover={{ y: -2 }} className={`rounded-3xl border border-white/10 bg-white/5 backdrop-blur-2xl p-6 shadow-2xl relative overflow-hidden group ${className}`}>
+    <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
     {title && (
       <div className="mb-5 flex items-center gap-3">
         {Icon && (
@@ -78,10 +79,10 @@ const Index = () => {
   return (
     <div className="w-full">
 
-      <main className=" mx-auto px-6 py-6 relative z-10">
+      <main className="mx-auto px-6 py-6 relative z-10">
         <motion.div initial="hidden" animate="visible" variants={panelVariants} className="grid grid-cols-12 gap-8">
           {/* Controls Column */}
-          <div className="col-span-12 lg:col-span-5 space-y-8">
+          <div className="col-span-12 lg:col-span-5 space-y-4">
             <SpatialCard title="Configuration" icon={Target}>
               <ScrambleInput />
             </SpatialCard>
@@ -103,19 +104,19 @@ const Index = () => {
           {/* Core Visualization Column */}
           <div className="col-span-12 lg:col-span-7 space-y-5">
             {/* 3D Visualization */}
-            <SpatialCard className="overflow-hidden border-white/10 bg-[#0F172A] p-0">
+            <SpatialCard className="overflow-hidden border-white/10 bg-black/30 p-0">
               {/* Header */}
-              <div className="flex items-center justify-between px-4 py-2 ">
+              {/* <div className="flex items-center justify-between px-4 py-2 ">
                 <div className="flex items-center gap-2">
                   <motion.div className="w-2 h-2 rounded-full bg-cyan-400" animate={{ opacity: [0.4, 1, 0.4] }} transition={{ duration: 2, repeat: Infinity }} />
                   <h3 className="text-xs font-semibold tracking-widest uppercase text-white/70">3D Visualization</h3>
                 </div>
 
                 <span className="text-[10px] font-mono text-purple-300/70 bg-purple-500/10 px-2 py-0.5 rounded border border-purple-500/20">{currentSolution ? `${currentSolution.split(" ").length} MOVES` : "IDLE"}</span>
-              </div>
+              </div> */}
 
               {/* Cube Viewport */}
-              <div className="relative flex items-center justify-center p-2 min-h-[400px]">
+              <div className="relative flex items-center justify-center p-4 min-h-[400px]">
                 <CubePlayer key={playerKey} scramble={scrambleNotation} solution={currentSolution} puzzle={puzzleSize} tempoScale={1.5} controlPanel="none" visualization="3D" background="none" autoPlay={isAutoPlay} />
               </div>
 
